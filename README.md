@@ -89,17 +89,15 @@ This is basically a dummy DFS created from docker Volumes...(maybe not...)
 # Run Sample applications
 
 
-## NY Bus Stops Data [Pyspark]
+## Concellos [Pyspark]
 
-This programs just loads archived data from [MTA Bus Time](http://web.mta.info/developers/MTA-Bus-Time-historical-data.html) and apply basic filters using spark sql, the result are persisted into a postgresql table.
-
-The loaded table will contain the following structure:
-
-latitude|longitude|time_received|vehicle_id|distance_along_trip|inferred_direction_id|inferred_phase|inferred_route_id|inferred_trip_id|next_scheduled_stop_distance|next_scheduled_stop_id|report_hour|report_date
----|---|---|---|---|---|---|---|---|---|---|---|---
-40.668602|-73.986697|2014-08-01 04:00:01|469|4135.34710710144|1|IN_PROGRESS|MTA NYCT_B63|MTA NYCT_JG_C4-Weekday-141500_B63_123|2.63183804205619|MTA_305423|2014-08-01 04:00:00|2014-08-01
+This program load concellos.csv and print in standard output the schema and result of a simple query
 
 To submit the app connect to one of the workers or the master and execute:
+
+```sh
+docker exec -it <container_id> /bin/bash
+```
 
 ```sh
 /opt/spark/bin/spark-submit --master spark://spark-master:7077 \
@@ -108,42 +106,6 @@ To submit the app connect to one of the workers or the master and execute:
 --executor-memory 1G \
 /opt/spark-apps/main.py
 ```
-
-![alt text](./articles/images/pyspark-demo.png "Spark UI with pyspark program running")
-
-## MTA Bus Analytics[Scala]
-
-This program takes the archived data from [MTA Bus Time](http://web.mta.info/developers/MTA-Bus-Time-historical-data.html) and make some aggregations on it, the calculated results are persisted on postgresql tables.
-
-Each persisted table correspond to a particullar aggregation:
-
-Table|Aggregation
----|---
-day_summary|A summary of vehicles reporting, stops visited, average speed and distance traveled(all vehicles)
-speed_excesses|Speed excesses calculated in a 5 minute window
-average_speed|Average speed by vehicle
-distance_traveled|Total Distance traveled by vehicle
-
-
-To submit the app connect to one of the workers or the master and execute:
-
-```sh
-/opt/spark/bin/spark-submit --deploy-mode cluster \
---master spark://spark-master:7077 \
---total-executor-cores 1 \
---class mta.processing.MTAStatisticsApp \
---driver-memory 1G \
---executor-memory 1G \
---jars /opt/spark-apps/postgresql-42.2.22.jar \
---conf spark.driver.extraJavaOptions='-Dconfig-path=/opt/spark-apps/mta.conf' \
---conf spark.executor.extraJavaOptions='-Dconfig-path=/opt/spark-apps/mta.conf' \
-/opt/spark-apps/mta-processing.jar
-```
-
-You will notice on the spark-ui a driver program and executor program running(In scala we can use deploy-mode cluster)
-
-![alt text](./articles/images/stats-app.png "Spark UI with scala program running")
-
 
 # Summary
 
