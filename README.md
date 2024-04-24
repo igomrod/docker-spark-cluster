@@ -135,9 +135,3 @@ apt install python3-pip
 pip3 install pyspark
 pyspark
 ```
-
-# What's left to do?
-
-* Right now to run applications in deploy-mode cluster is necessary to specify arbitrary driver port.
-
-* The spark submit entry in the start-spark.sh is unimplemented, the submit used in the demos can be triggered from any worker
