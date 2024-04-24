@@ -10,26 +10,20 @@ def init_spark():
   return sql,sc
 
 def main():
-  url = "jdbc:postgresql://demo-database:5432/mta_data"
-  properties = {
-    "user": "postgres",
-    "password": "casa1234",
-    "driver": "org.postgresql.Driver"
-  }
-  file = "/opt/spark-data/MTA_2014_08_01.csv"
+  # url = "jdbc:postgresql://demo-database:5432/mta_data"
+  # properties = {
+  #   "user": "postgres",
+  #   "password": "casa1234",
+  #   "driver": "org.postgresql.Driver"
+  # }
+  file = "/opt/spark-data/concellos.csv"
   sql,sc = init_spark()
 
-  df = sql.read.load(file,format = "csv", inferSchema="true", sep="\t", header="true"
-      ) \
-      .withColumn("report_hour",date_format(col("time_received"),"yyyy-MM-dd HH:00:00")) \
-      .withColumn("report_date",date_format(col("time_received"),"yyyy-MM-dd"))
+  df = sql.read.load(file,format = "csv", inferSchema="true", sep=",", header="true")
   
-  # Filter invalid coordinates
-  df.where("latitude <= 90 AND latitude >= -90 AND longitude <= 180 AND longitude >= -180") \
-    .where("latitude != 0.000000 OR longitude !=  0.000000 ") \
-    .write \
-    .jdbc(url=url, table="mta_reports", mode='append', properties=properties) \
-    .save()
+  df.printSchema()
+
+  df.select("PROVINCIA").distinct().show(10)
   
 if __name__ == '__main__':
   main()
